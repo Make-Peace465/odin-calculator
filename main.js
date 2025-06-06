@@ -3,14 +3,14 @@ let secondNum;
 let operator;
 let result;
 let resetScreenAfterResult = 0;
-let numCount = 0;
 
-const selectedBtns = document.querySelectorAll(".numberBtnContainer > button")
+
+const selectedBtns = document.querySelectorAll(".numberBtnContainer > .numberBtn")
     selectedBtns.forEach(btn => {
 	    btn.addEventListener("click", function() {
-            console.log("resetScreenAfterResult" + resetScreenAfterResult)
             if (resetScreenAfterResult === 1) {
                 clearTheScreen();
+                resetCalculator();
                 showDigitOnScreen(event);
                 resetScreenAfterResult = 0;
             } else {
@@ -23,13 +23,10 @@ const selectedOperatorBtns = document.querySelectorAll(".operatorContainer > but
     selectedOperatorBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             if ((resetScreenAfterResult === 1) && ((operator === "+") || (operator === "-") || (operator === "x") || (operator === "÷"))) {
-                console.log(resetScreenAfterResult);
                 getTheOperators(event);
                 getTheFirstNum(event);
                 clearTheScreen();
             } else if ((resetScreenAfterResult === 0) && ((operator === "+") || (operator === "-") || (operator === "x") || (operator === "÷"))) {
-                getTheOperators(event);
-            } else if ((operator === "+") || (operator === "-") || (operator === "x") || (operator === "÷")) {
                 getTheSecondNum();
                 const calcResult = calculateTheResult();
                 if (calcResult != "DIV_ZERO") {
@@ -37,6 +34,7 @@ const selectedOperatorBtns = document.querySelectorAll(".operatorContainer > but
                 }
                 firstNum = result;
                 getTheOperators(event);
+                clearTheScreen();
                 resetScreenAfterResult = 1;
             } else {
                 getTheFirstNum(event);
@@ -48,11 +46,16 @@ const selectedOperatorBtns = document.querySelectorAll(".operatorContainer > but
 
 const selectedEqualBtns = document.querySelector(".equalBtn");
 selectedEqualBtns.addEventListener("click", () => {
+    if (!operator) return;
     getTheSecondNum();
     clearTheScreen();
     const calcResult = calculateTheResult();
     if (calcResult != "DIV_ZERO") {
-        displayResultOnScreen();
+        if (calcResult > 1000000000000) {
+            checkDigitOnScreen(result);
+        } else {
+            displayResultOnScreen();
+        }
     }
     firstNum = result;
     resetScreenAfterResult = 1;
@@ -63,6 +66,18 @@ selectedClearBtns.addEventListener("click", () => {
     clearTheScreen();
     resetCalculator();
 })
+
+const deleteBtn = document.querySelector(".deleteBtn");
+deleteBtn.addEventListener("click", deleteTheLastNumber);
+
+function checkDigitOnScreen(num) {
+    const displayScreen = document.querySelector(".display");
+    let text = num.toString();
+    let numberArray = text.split("");
+    let newNumberArray = numberArray.slice(0, 11);
+    number = newNumberArray.join("");
+    displayScreen.append(number);
+}
 
 function addition(a, b) {
     let result = a + b;
@@ -86,15 +101,25 @@ function division(a , b) {
 
 function showDigitOnScreen(event) {
     const displayScreen = document.querySelector(".display");
-    // const clickedBtn = event.target.textContent;
-    displayScreen.append(event.target.textContent);
+    if (event.target.textContent === '.' && displayScreen.textContent.includes('.')) {
+        return; 
+    }
+    if (Number(displayScreen.textContent) > 100000000000) {
+        console.log(displayScreen.textContent);
+        let text = displayScreen.textContent;
+        let numberArray = text.split("");
+        let number = numberArray.slice(0, 11).join("");
+        clearTheScreen();
+        displayScreen.append(number);
+    } else {
+        displayScreen.append(event.target.textContent);
+    }
     return;
 }
 
 function getTheFirstNum() {
     const displayScreen = document.querySelector(".display");
     firstNum = Number(displayScreen.textContent);
-    numCount += 1;
     return firstNum;
 }
 
@@ -109,7 +134,6 @@ function getTheSecondNum() {
     const displayScreen = document.querySelector(".display");
     // console.log(displayScreen.textContent);
     secondNum = Number(displayScreen.textContent);
-    numCount += 1;
     return secondNum;
 }
 
@@ -122,7 +146,7 @@ function resetCalculator() {
 function clearTheScreen() {
     const displayScreen = document.querySelector(".display");
     displayScreen.textContent = "";
-    console.log("Screen cleared");
+    // console.log("Screen cleared");
     return;
 }
 
@@ -156,7 +180,7 @@ function calculateTheResult() {
 
 function divideByZero() {
     const displayScreen = document.querySelector(".display");
-    displayScreen.append("No divide by zero please ;)");
+    displayScreen.append("Error!");
     setTimeout(() => {
         resetCalculator(); 
         clearTheScreen();
@@ -166,6 +190,25 @@ function divideByZero() {
 
 function displayResultOnScreen() {
     const displayScreen = document.querySelector(".display");
-    displayScreen.textContent = result;
+    if (result > 1000000000000) {
+        let text = result.toString();
+        let numberArray = text.split("");
+        let number = numberArray.slice(0, 11).join("");
+        clearTheScreen();
+        displayScreen.append(number);
+    } else {
+        displayScreen.append(result);
+    }
     return;
+}
+
+function deleteTheLastNumber() {
+    const displayScreen = document.querySelector(".display");
+    let number = displayScreen.textContent;
+    let numberArray = number.split("");
+    numberArray.pop();
+    number = numberArray.join("");
+    clearTheScreen();
+    displayScreen.append(number);
+    return number;
 }
