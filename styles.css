@@ -1,7 +1,42 @@
 .display {
     width: 500px;
-    height: 40px;
-    background-color: darkgray;
+    height: 50px;
+    font-size: 40px;
+    background-color: rgb(95, 95, 95);
     margin-bottom: 5px;
     color: white;
+}
+
+.numberBtnContainer {
+    display: flex;
+    gap: 5px;
+}
+
+.numberBtnContainer > button {
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+}
+
+.operatorContainer > button {
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+}
+
+.equalBtn {
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+}
+
+.clearBtn {
+    width: 60px;
+    height: 40px;
+    font-size: 30px;
+}
+
+p {
+    color: white;
+    font-size: 40px;
 }
