@@ -7,7 +7,7 @@ const operatorBtn = document.querySelectorAll(".operatorBtn");
 
 let firstNum = "";
 let secondNum = "";
-let result;
+let result = 0;
 let operator = null;
 let num = "";
 
@@ -16,35 +16,64 @@ numberBtn.forEach(function(numberBtn) {
 });
 
 operatorBtn.forEach(function(operatorBtn) {
-    operatorBtn.addEventListener("click", () => {
+    operatorBtn.addEventListener("click", function(e) {
+        num = Number(num);
+
+        //First time calculation
         if (operator === null) {
 
             firstNum = num;
-            console.log(firstNum);
-            display.textContent = "";
+            console.log(`first number is ${firstNum}`)
             operator = this.textContent;
-            console.log(this);
-            console.log(operator);
+            display.textContent = "";
             num = "";
 
         } else {
 
             secondNum = num;
-            operator = this.textContent;
+            console.log(`second number is ${secondNum}`)
+            //operate the number first
             operate(firstNum,secondNum);
-            console.log(result);
-            display.textContent = result;
+            //update the number
+            operator = this.textContent;
+
+            //check if second number is zero
+            if ((secondNum === 0) && (operator === "/")) {
+                display.textContent = "Please be wise!";
+                return;
+            }
+
+            //display the result
+            textResult = result.toString().slice(0, 13);
+            display.textContent = textResult;
+
+            //move the result to first number
+            firstNum = result;
             num = "";
         } 
     })
 })
 
 equalBtn.addEventListener("click", () => {
-        secondNum = num;
-        operator = this.textContent;
+        num = Number(num);
+
+        if (operator === null) {
+            return;
+        }
+
+        secondNum = num; 
+
+        if ((secondNum === 0) && (operator === "/")) {
+            display.textContent = "Please be wise!";
+            return;
+        }
+
         operate(firstNum,secondNum);
-        console.log(result);
-        display.textContent = result;
+        textResult = result.toString().slice(0, 12);
+        display.textContent = textResult;
+        console.log(`first number is ${firstNum}`)
+        console.log(`second number is ${secondNum}`)
+        firstNum = result;
         num = "";
 });
 
@@ -62,6 +91,9 @@ deleteBtn.addEventListener("click", () => {
 })
 
 function operate(a, b) {
+    //Convert a and b to number to ensure
+    a = +a;
+    b = +b;
 
     switch(operator) {
 
@@ -86,8 +118,10 @@ function operate(a, b) {
 
 function displayNum() {
     num += this.textContent;
-    display.textContent = num;
-    num = Number(num);
-    console.log(num);
-    console.log(typeof num);
+
+    if (num.length > 12) {
+        display.textContent = num.slice(-13, -1);;
+    } else {
+        display.textContent = num;
+    }
 };
