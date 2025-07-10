@@ -5,97 +5,98 @@ const deleteBtn = document.querySelector(".deleteBtn");
 const equalBtn = document.querySelector(".equalBtn");
 const operatorBtn = document.querySelectorAll(".operatorBtn");
 
-let firstNum = "";
-let secondNum = "";
+let secondNum = 0;
 let result = 0;
-let operator = null;
-let num = "";
+
+const calculator = {
+  displayValue: '',
+  firstOperand: null,
+  operator: null,
+  waitingForSecondOperand: false
+};
 
 numberBtn.forEach(function(numberBtn) {
     numberBtn.addEventListener("click", displayNum);
 });
 
 operatorBtn.forEach(function(operatorBtn) {
-    operatorBtn.addEventListener("click", function(e) {
-        num = Number(num);
+    operatorBtn.addEventListener("click", (e) => {
+        handleOperator(e.target.textContent);
+    })
+})
 
-        //First time calculation
-        if (operator === null) {
+equalBtn.addEventListener("click", performCalculation);
 
-            firstNum = num;
-            console.log(`first number is ${firstNum}`)
-            operator = this.textContent;
+clearBtn.addEventListener("click", resetCalculator);
+
+deleteBtn.addEventListener("click", () => {
+    return num = Number(num.toString().slice(0, -1));
+})
+
+function handleOperator(target) {
+    if (calculator.waitingForSecondOperand === false) {
+
+            calculator.firstOperand = calculator.displayValue;
+            calculator.operator = this.textContent;
+
             display.textContent = "";
-            num = "";
+            calculator.displayValue = "";
 
+            calculator.waitingForSecondOperand = true;
+            
         } else {
 
-            secondNum = num;
-            console.log(`second number is ${secondNum}`)
+            secondNum = Number(calculator.displayValue);
+           
             //operate the number first
-            operate(firstNum,secondNum);
-            //update the number
-            operator = this.textContent;
+            operate(calculator.firstOperand,secondNum);
+            //update the operator
+            calculator.operator = this.textContent;
 
             //check if second number is zero
-            if ((secondNum === 0) && (operator === "/")) {
+            if ((secondNum === 0) && (calculator.operator === "/")) {
                 display.textContent = "Please be wise!";
                 return;
             }
 
             //display the result
-            textResult = result.toString().slice(0, 13);
-            display.textContent = textResult;
+            calculator.displayValue = result.toString().slice(0, 13);
+            display.textContent = calculator.displayValue;
+            
+            calculator.displayValue = "";
 
             //move the result to first number
-            firstNum = result;
-            num = "";
-        } 
-    })
-})
-
-equalBtn.addEventListener("click", () => {
-        num = Number(num);
-
-        if (operator === null) {
-            return;
+            calculator.firstOperand = result;
         }
+}
 
-        secondNum = num; 
+function performCalculation() {
+    secondNum = calculator.displayValue;
 
-        if ((secondNum === 0) && (operator === "/")) {
+        if (calculator.operator === null) {
+            resetCalculator();
+            return;
+        } 
+
+        if ((secondNum === 0) && (calculator.operator === "/")) {
             display.textContent = "Please be wise!";
             return;
         }
 
-        operate(firstNum,secondNum);
-        textResult = result.toString().slice(0, 12);
-        display.textContent = textResult;
-        console.log(`first number is ${firstNum}`)
-        console.log(`second number is ${secondNum}`)
-        firstNum = result;
-        num = "";
-});
+        operate(calculator.firstOperand,secondNum);
+        calculator.displayValue = result.toString().slice(0, 12);
+        display.textContent = calculator.displayValue
+        calculator.firstOperand = result;
 
-clearBtn.addEventListener("click", () => {
-    firstNum = "";
-    secondNum = "";
-    result = 0;
-    operator = null;
-    num = "";
-    display.textContent = "";
-});
-
-deleteBtn.addEventListener("click", () => {
-    return num = Number(num.toString().slice(0, -1));
-})
+        calculator.displayValue = "";
+}
 
 function operate(a, b) {
     //Convert a and b to number to ensure
     a = +a;
     b = +b;
 
-    switch(operator) {
+    switch(calculator.operator) {
 
         case "+":
             result = a + b;
@@ -116,12 +117,24 @@ function operate(a, b) {
     }
 }
 
-function displayNum() {
-    num += this.textContent;
+function resetCalculator() {
+    secondNum = "";
+    result = 0;
+    display.textContent = "";
 
-    if (num.length > 12) {
-        display.textContent = num.slice(-13, -1);;
+    //calculator object
+    calculator.displayValue = '';
+    calculator.firstOperand = null;
+    calculator.operator =  null;
+    calculator.waitingForSecondOperand = false;
+}
+
+function displayNum() {
+    calculator.displayValue += this.textContent;
+
+    if (calculator.displayValue.length > 12) {
+        display.textContent = calculator.displayValue.slice(-13, -1);;
     } else {
-        display.textContent = num;
+        display.textContent = calculator.displayValue;
     }
 };
