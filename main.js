@@ -4,19 +4,18 @@ const clearBtn = document.querySelector(".clearBtn");
 const deleteBtn = document.querySelector(".deleteBtn");
 const equalBtn = document.querySelector(".equalBtn");
 const operatorBtn = document.querySelectorAll(".operatorBtn");
-
-let secondNum = 0;
-let result = 0;
+const dotBtn = document.querySelector(".dotBtn");
 
 const calculator = {
   displayValue: '',
   firstOperand: null,
+  secondOperand: null,
   operator: null,
   waitingForSecondOperand: false
 };
 
-numberBtn.forEach(function(numberBtn) {
-    numberBtn.addEventListener("click", displayNum);
+numberBtn.forEach(button => {
+    button.addEventListener("click", () => inputDigit(button.textContent));
 });
 
 operatorBtn.forEach(function(operatorBtn) {
@@ -34,84 +33,87 @@ deleteBtn.addEventListener("click", () => {
 })
 
 function handleOperator(target) {
-    if (calculator.waitingForSecondOperand === false) {
+    let currentValue = Number(calculator.displayValue);
 
-            calculator.firstOperand = calculator.displayValue;
-            calculator.operator = this.textContent;
+    if (calculator.operator && calculator.waitingForSecondOperand) {
+        calculator.operator = target.textContent;
+        return;
+    }
 
-            display.textContent = "";
-            calculator.displayValue = "";
+    if ((firstOperand) && (calculator.operator !== null)) {
+        let result = calculate(calculator.firstOperand, currentValue, calculator.operator);
+        calculator.displayValue = result;
+        calculator.firstOperand = result;
+        updateDisplay(result);
+    }   else {
+        calculator.firstOperand = currentValue;
+    }
 
-            calculator.waitingForSecondOperand = true;
-            
-        } else {
-
-            secondNum = Number(calculator.displayValue);
-           
-            //operate the number first
-            operate(calculator.firstOperand,secondNum);
-            //update the operator
-            calculator.operator = this.textContent;
-
-            //check if second number is zero
-            if ((secondNum === 0) && (calculator.operator === "/")) {
-                display.textContent = "Please be wise!";
-                return;
-            }
-
-            //display the result
-            calculator.displayValue = result.toString().slice(0, 13);
-            display.textContent = calculator.displayValue;
-            
-            calculator.displayValue = "";
-
-            //move the result to first number
-            calculator.firstOperand = result;
-        }
+    calculator.waitingForSecondOperand = true
+    calculator.operator = target.textContent
 }
 
-function performCalculation() {
-    secondNum = calculator.displayValue;
+//A function to manage the workflow, the controller function
+function handleEquals() {
 
+        // --- GUARD CLAUSE ---
+        //CHeck the state of the APP instead of the calculation
         if (calculator.operator === null) {
             resetCalculator();
             return;
         } 
 
-        if ((secondNum === 0) && (calculator.operator === "/")) {
+        // --- CALL THE WORKER ---
+        let result = operate(calculator.firstOperand,secondNum);
+
+        // --- UPDATE THE UI & STATE
+       updateDisplay(result);
+       updateCalculatorStateAfterCalculation(result);
+}
+
+function updateDisplay(value) {
+    if (value === "ERROR") {
+        display.textContent = "Please be wise!";
+    } else {
+        display.textContent = String(value).slice(0,12);
+    }
+}
+
+function updateCalculatorStateAfterCalculation(result) {
+    if (result = "ERROR") {
+        resetCalculator();
+    } else {
+        //Prepare for the next calculation
+        calculator.firstOperand = result;
+        calculator.displayValue = String(result);
+        calculator.operator = null;
+        calculator.waitingForSecondOperand = true;
+    }
+}
+
+function operate(firstOperand, secondOperanad, operator) {
+
+    if ((secondOperanad === 0) && (operator === "/")) {
             display.textContent = "Please be wise!";
             return;
         }
 
-        operate(calculator.firstOperand,secondNum);
-        calculator.displayValue = result.toString().slice(0, 12);
-        display.textContent = calculator.displayValue
-        calculator.firstOperand = result;
-
-        calculator.displayValue = "";
-}
-
-function operate(a, b) {
-    //Convert a and b to number to ensure
-    a = +a;
-    b = +b;
-
     switch(calculator.operator) {
 
         case "+":
-            result = a + b;
+            result = firstOperand + secondOperanad;
             return;
 
         case "-":
-            result = a - b;
+            result = firstOperand - secondOperanad;
             return;
 
         case "/":
-            result = a / b;
+            result = firstOperand / secondOperanad;
             return;
         
         case "*":
-            result = a * b;
+            result = firstOperand * secondOperanad;
             return;
 
     }
@@ -129,9 +131,20 @@ function resetCalculator() {
     calculator.waitingForSecondOperand = false;
 }
 
-function displayNum() {
-    calculator.displayValue += this.textContent;
+function inputDigit(digit) {
+    calculator.displayValue += digit;
+}
 
+function inputDecimal(dot) {
+    if ((calculator.displayValue !== null) && (calculator.displayValue.includes(".") !== true)) {
+        calculator.displayValue += dot;
+    } else {
+        return;
+    }
+}
+
+//A function to display Number on the screen
+function displayNum() {
     if (calculator.displayValue.length > 12) {
         display.textContent = calculator.displayValue.slice(-13, -1);;
     } else {
