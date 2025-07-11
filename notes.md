@@ -136,4 +136,38 @@ END FUNCTION
 - What is the proper way of using forEach?
     - syntax: array.forEach(callback(element, index, arr), thisValue);
     
+## Debugging log
+1. Why the second number has no value and not show zero when press 8/0;
 
+## Amendment
+Direction 1: The "Single Source of Truth" Principle
+
+const calculator = {
+  displayValue: '0', // What's shown on screen
+  firstOperand: null,
+  operator: null,
+  waitingForSecondOperand: false
+};
+
+- 5 + 3 + 4 = 12
+
+1. Enter 5 +
+    displayVaue = ""
+    firstOperand = 5
+    operator = +
+    waitingForSecondOperand: true
+
+2. Enter 3 +
+    secondNum = 3
+    firstOperand = 8
+    result = 8
+    operator = "+"
+    waitingForSecondOperand: false
+    displayValue = 8
+    calculator.firstOperand = 8
+
+3. Enter 4 =
+    secondNum = 4
+    result = 12
+    displayValue = 12
+    calculator.firstOperand = 12;
