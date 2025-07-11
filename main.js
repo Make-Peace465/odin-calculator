@@ -41,7 +41,7 @@ function handleOperator(target) {
     }
 
     if ((firstOperand) && (calculator.operator !== null)) {
-        let result = calculate(calculator.firstOperand, currentValue, calculator.operator);
+        let result = operate(calculator.firstOperand, currentValue, calculator.operator);
         calculator.displayValue = result;
         calculator.firstOperand = result;
         updateDisplay(result);
