@@ -127,6 +127,20 @@ FUNCTION operate(a, b):
     END SWITCH
 END FUNCTION
 
+inputDecimal(dot)
+1. Check if there are already number in the displayValue
+2. Check if there is already another dot in the displayValue
+3. If not, add the dot the displayValue
+
+IF (displayValue !== null) and (displayValue.includes(".") !== true):
+    calculator.displayValue += dot;
+ELSE:
+    RETURN
+END ELSE
+END IF
+
+
+
 ## Question
 - Will number add string become string? 
     Yes, the + operator will performs type coercion
@@ -171,3 +185,4 @@ const calculator = {
     result = 12
     displayValue = 12
     calculator.firstOperand = 12;
+
