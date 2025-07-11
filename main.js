@@ -15,7 +15,10 @@ const calculator = {
 };
 
 numberBtn.forEach(button => {
-    button.addEventListener("click", () => inputDigit(button.textContent));
+    button.addEventListener("click", () => {
+        inputDigit(button.textContent)
+        displayNum();
+    });
 });
 
 operatorBtn.forEach(function(operatorBtn) {
@@ -24,7 +27,7 @@ operatorBtn.forEach(function(operatorBtn) {
     })
 })
 
-equalBtn.addEventListener("click", performCalculation);
+equalBtn.addEventListener("click", handleEquals);
 
 clearBtn.addEventListener("click", resetCalculator);
 
