@@ -16,7 +16,7 @@ const calculator = {
 
 numberBtn.forEach(button => {
     button.addEventListener("click", () => {
-        inputDigit(button.textContent)
+        inputDigit(button.textContent);
         displayNum();
     });
 });
@@ -38,26 +38,33 @@ deleteBtn.addEventListener("click", () => {
 function handleOperator(target) {
     let currentValue = Number(calculator.displayValue);
 
+    // Handled edge case: typing 2 operators in a row
     if (calculator.operator && calculator.waitingForSecondOperand) {
-        calculator.operator = target.textContent;
+        calculator.operator = target;
         return;
     }
 
-    if ((firstOperand) && (calculator.operator !== null)) {
+    console.log(calculator.operator);
+
+    if (calculator.firstOperand == null) {
+        calculator.firstOperand = currentValue;
+    } else if (calculator.operator) {
         let result = operate(calculator.firstOperand, currentValue, calculator.operator);
         calculator.displayValue = result;
         calculator.firstOperand = result;
         updateDisplay(result);
-    }   else {
-        calculator.firstOperand = currentValue;
     }
 
-    calculator.waitingForSecondOperand = true
-    calculator.operator = target.textContent
+    calculator.displayValue = "";
+    calculator.operator = target;
+    calculator.waitingForSecondOperand = true;
+    console.log(calculator);
 }
 
 //A function to manage the workflow, the controller function
 function handleEquals() {
+        let currentValue = Number(calculator.displayValue);
+        console.log(currentValue);
 
         // --- GUARD CLAUSE ---
         //CHeck the state of the APP instead of the calculation
@@ -67,7 +74,8 @@ function handleEquals() {
         } 
 
         // --- CALL THE WORKER ---
-        let result = operate(calculator.firstOperand,secondNum);
+        let result = operate(calculator.firstOperand, currentValue, calculator.operator);
+        console.log(`The result is ${result}`);
 
         // --- UPDATE THE UI & STATE
        updateDisplay(result);
@@ -83,41 +91,37 @@ function updateDisplay(value) {
 }
 
 function updateCalculatorStateAfterCalculation(result) {
-    if (result = "ERROR") {
-        resetCalculator();
+    if (result === "ERROR") {
+        display.textContent = "Please be wise!";
     } else {
         //Prepare for the next calculation
         calculator.firstOperand = result;
         calculator.displayValue = String(result);
         calculator.operator = null;
-        calculator.waitingForSecondOperand = true;
+        calculator.waitingForSecondOperand = false;
     }
 }
 
-function operate(firstOperand, secondOperanad, operator) {
+function operate(firstOperand, secondOperand, operator) {
 
-    if ((secondOperanad === 0) && (operator === "/")) {
+    if ((secondOperand === 0) && (operator === "/")) {
             display.textContent = "Please be wise!";
             return;
         }
 
-    switch(calculator.operator) {
+    switch(operator) {
 
         case "+":
-            result = firstOperand + secondOperanad;
-            return;
+            return firstOperand + secondOperand;
 
         case "-":
-            result = firstOperand - secondOperanad;
-            return;
+            return firstOperand - secondOperand;
 
         case "/":
-            result = firstOperand / secondOperanad;
-            return;
-        
+            return firstOperand / secondOperand;
+
         case "*":
-            result = firstOperand * secondOperanad;
-            return;
+            return firstOperand * secondOperand;
 
     }
 }
