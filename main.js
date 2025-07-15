@@ -32,14 +32,20 @@ equalBtn.addEventListener("click", handleEquals);
 clearBtn.addEventListener("click", resetCalculator);
 
 deleteBtn.addEventListener("click", () => {
-    return num = Number(num.toString().slice(0, -1));
+    calculator.displayValue = calculator.displayValue.slice(0, -1);
+    displayNum();
 })
+
+dotBtn.addEventListener("click", () => {
+    inputDecimal(".");
+    displayNum();
+});
 
 function handleOperator(target) {
     let currentValue = Number(calculator.displayValue);
 
     // Handled edge case: typing 2 operators in a row
-    if (calculator.operator && calculator.waitingForSecondOperand) {
+    if (calculator.operator && calculator.waitingForSecondOperand && calculator.displayValue === "") {
         calculator.operator = target;
         return;
     }
@@ -58,7 +64,6 @@ function handleOperator(target) {
     calculator.displayValue = "";
     calculator.operator = target;
     calculator.waitingForSecondOperand = true;
-    console.log(calculator);
 }
 
 //A function to manage the workflow, the controller function
@@ -75,7 +80,6 @@ function handleEquals() {
 
         // --- CALL THE WORKER ---
         let result = operate(calculator.firstOperand, currentValue, calculator.operator);
-        console.log(`The result is ${result}`);
 
         // --- UPDATE THE UI & STATE
        updateDisplay(result);
@@ -83,7 +87,7 @@ function handleEquals() {
 }
 
 function updateDisplay(value) {
-    if (value === "ERROR") {
+    if ((value === "ERROR") || (value === undefined)) {
         display.textContent = "Please be wise!";
     } else {
         display.textContent = String(value).slice(0,12);
@@ -105,7 +109,6 @@ function updateCalculatorStateAfterCalculation(result) {
 function operate(firstOperand, secondOperand, operator) {
 
     if ((secondOperand === 0) && (operator === "/")) {
-            display.textContent = "Please be wise!";
             return;
         }
 
@@ -143,7 +146,7 @@ function inputDigit(digit) {
 }
 
 function inputDecimal(dot) {
-    if ((calculator.displayValue !== null) && (calculator.displayValue.includes(".") !== true)) {
+    if ((calculator.displayValue) && (calculator.displayValue.includes(".") === false)) {
         calculator.displayValue += dot;
     } else {
         return;
