@@ -11,13 +11,14 @@ const calculator = {
   firstOperand: null,
   secondOperand: null,
   operator: null,
-  waitingForSecondOperand: false
+  waitingForSecondOperand: false,
+  resultCalculated: false,
 };
 
 numberBtn.forEach(button => {
     button.addEventListener("click", () => {
         inputDigit(button.textContent);
-        displayNum();
+        updateDisplay(calculator.displayValue);
     });
 });
 
@@ -33,24 +34,25 @@ clearBtn.addEventListener("click", resetCalculator);
 
 deleteBtn.addEventListener("click", () => {
     calculator.displayValue = calculator.displayValue.slice(0, -1);
-    displayNum();
+    updateDisplay(calculator.displayValue);
 })
 
 dotBtn.addEventListener("click", () => {
     inputDecimal(".");
-    displayNum();
+    updateDisplay(calculator.displayValue);
 });
 
 function handleOperator(target) {
     let currentValue = Number(calculator.displayValue);
+    console.log(currentValue);
+    console.log(calculator.operator);
 
     // Handled edge case: typing 2 operators in a row
     if (calculator.operator && calculator.waitingForSecondOperand && calculator.displayValue === "") {
         calculator.operator = target;
+        console.log("This has been ran;")
         return;
     }
-
-    console.log(calculator.operator);
 
     if (calculator.firstOperand == null) {
         calculator.firstOperand = currentValue;
@@ -62,14 +64,21 @@ function handleOperator(target) {
     }
 
     calculator.displayValue = "";
+    calculator.resultCalculated = false;
     calculator.operator = target;
     calculator.waitingForSecondOperand = true;
+
+    console.log(calculator);
 }
 
 //A function to manage the workflow, the controller function
 function handleEquals() {
+
+        if (calculator.operator === null && calculator.waitingForSecondOperand === false) {
+            return;
+        }
+
         let currentValue = Number(calculator.displayValue);
-        console.log(currentValue);
 
         // --- GUARD CLAUSE ---
         //CHeck the state of the APP instead of the calculation
@@ -102,7 +111,9 @@ function updateCalculatorStateAfterCalculation(result) {
         calculator.firstOperand = result;
         calculator.displayValue = String(result);
         calculator.operator = null;
+        calculator.resultCalculated = true;
         calculator.waitingForSecondOperand = false;
+        console.log(calculator);
     }
 }
 
@@ -139,10 +150,16 @@ function resetCalculator() {
     calculator.firstOperand = null;
     calculator.operator =  null;
     calculator.waitingForSecondOperand = false;
+    calculator.resultCalculated = false;
 }
 
 function inputDigit(digit) {
-    calculator.displayValue += digit;
+    if (calculator.resultCalculated === true) {
+        resetCalculator();
+        calculator.displayValue = digit;
+    } else {
+        calculator.displayValue += digit;
+    }
 }
 
 function inputDecimal(dot) {
@@ -153,11 +170,11 @@ function inputDecimal(dot) {
     }
 }
 
-//A function to display Number on the screen
-function displayNum() {
-    if (calculator.displayValue.length > 12) {
-        display.textContent = calculator.displayValue.slice(-13, -1);;
-    } else {
-        display.textContent = calculator.displayValue;
-    }
-};
+// //A function to display Number on the screen
+// function displayNum() {
+//     if (calculator.displayValue.length > 12) {
+//         display.textContent = calculator.displayValue.slice(-13, -1);;
+//     } else {
+//         display.textContent = calculator.displayValue;
+//     }
+// };
